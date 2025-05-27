@@ -18,6 +18,7 @@ server.tool('add', 'add two number', { a: z.number(), b: z.number() }, async ({ 
 }));
 
 // Ejemplo de una tool que devuelve la informacion de un usuario de github
+
 server.tool(
   'github-user',
   'get github user information',
@@ -147,3 +148,47 @@ async function resourceCallback(uri: URL) {
     return { contents: [] };
   }
 }
+
+// Ejemplo de una tool que devuelve los repositorios de un usuario de github
+server.tool(
+  'github-repos',
+  'get github user repositories',
+  { username: z.string() },
+  async ({ username }) => {
+    const response = await fetch(`https://api.github.com/users/${username}/repos`);
+    if (!response.ok) {
+      throw new Error(`Error fetching repositories: ${response.statusText}`);
+    }
+    const reposData = await response.json();
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(reposData, null, 2)
+        }
+      ]
+    };
+  }
+);
+
+// Ejemplo de una tool que devuelve los issues de un repositorio de github
+server.tool(
+  'github-issues',
+  'get github repository issues',
+  { username: z.string(), repo: z.string() },
+  async ({ username, repo }) => {
+    const response = await fetch(`https://api.github.com/repos/${username}/${repo}/issues`);
+    if (!response.ok) {
+      throw new Error(`Error fetching issues: ${response.statusText}`);
+    }
+    const issuesData = await response.json();
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(issuesData, null, 2)
+        }
+      ]
+    };
+  }
+);
