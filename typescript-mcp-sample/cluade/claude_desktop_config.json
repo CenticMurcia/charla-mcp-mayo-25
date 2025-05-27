@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "charla-mcp-docker": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "charlamcp-centic"
+      ]
+    }
+  }
+}
