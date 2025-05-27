@@ -1,0 +1,327 @@
+{
+  // ===== METADATOS BÁSICOS =====
+  "name": "example-mcp-server",
+  "version": "1.2.0",
+  "description": "Servidor MCP de ejemplo que proporciona acceso a datos de usuarios y herramientas de análisis",
+  "author": "Tu Nombre <email@ejemplo.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/usuario/example-mcp-server",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usuario/example-mcp-server.git"
+  },
+
+  // ===== CONFIGURACIÓN DEL SERVIDOR =====
+  "server": {
+    "host": "localhost",
+    "port": 3000,
+    "protocol": "http",
+    "timeout": 30000,
+    "maxConnections": 100,
+    "cors": {
+      "enabled": true,
+      "origins": ["http://localhost:3001", "https://app.ejemplo.com"],
+      "methods": ["GET", "POST", "PUT", "DELETE"],
+      "allowedHeaders": ["Content-Type", "Authorization", "X-MCP-Version"]
+    }
+  },
+
+  // ===== HERRAMIENTAS DISPONIBLES =====
+  "tools": [
+    {
+      "name": "search_users",
+      "description": "Busca usuarios en la base de datos por diferentes criterios",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Término de búsqueda"
+          },
+          "filter": {
+            "type": "string",
+            "enum": ["active", "inactive", "all"],
+            "default": "active",
+            "description": "Filtro de estado de usuarios"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10,
+            "description": "Número máximo de resultados"
+          }
+        },
+        "required": ["query"]
+      },
+      "timeout": 5000,
+      "rateLimiting": {
+        "maxRequests": 100,
+        "windowMs": 3600000
+      }
+    },
+    {
+      "name": "generate_report",
+      "description": "Genera reportes estadísticos basados en los datos disponibles",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "reportType": {
+            "type": "string",
+            "enum": ["daily", "weekly", "monthly", "custom"],
+            "description": "Tipo de reporte a generar"
+          },
+          "dateRange": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date",
+                "description": "Fecha de inicio (YYYY-MM-DD)"
+              },
+              "end": {
+                "type": "string",
+                "format": "date",
+                "description": "Fecha de fin (YYYY-MM-DD)"
+              }
+            },
+            "required": ["start", "end"]
+          },
+          "format": {
+            "type": "string",
+            "enum": ["json", "csv", "pdf"],
+            "default": "json",
+            "description": "Formato de salida del reporte"
+          }
+        },
+        "required": ["reportType", "dateRange"]
+      },
+      "timeout": 15000,
+      "authentication": ["api_key", "oauth2"]
+    }
+  ],
+
+  // ===== RECURSOS DISPONIBLES =====
+  "resources": [
+    {
+      "name": "users",
+      "description": "Base de datos de usuarios del sistema",
+      "type": "database",
+      "uri": "mcp://users/*",
+      "methods": ["read", "search"],
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"},
+          "email": {"type": "string", "format": "email"},
+          "status": {"type": "string", "enum": ["active", "inactive"]},
+          "createdAt": {"type": "string", "format": "date-time"},
+          "metadata": {"type": "object"}
+        }
+      }
+    },
+    {
+      "name": "analytics",
+      "description": "Datos analíticos y métricas del sistema",
+      "type": "api",
+      "uri": "mcp://analytics/*",
+      "methods": ["read"],
+      "refreshInterval": 300000,
+      "cacheDuration": 600000
+    },
+    {
+      "name": "files",
+      "description": "Sistema de archivos para documentos y reportes",
+      "type": "filesystem",
+      "uri": "mcp://files/*",
+      "methods": ["read", "write", "delete"],
+      "maxFileSize": 52428800,
+      "allowedExtensions": [".txt", ".csv", ".json", ".pdf", ".xlsx"]
+    }
+  ],
+
+  // ===== CONFIGURACIÓN DE AUTENTICACIÓN =====
+  "authentication": {
+    "required": true,
+    "methods": [
+      {
+        "type": "api_key",
+        "headerName": "X-API-Key",
+        "description": "Clave API para autenticación básica"
+      },
+      {
+        "type": "oauth2",
+        "authorizationUrl": "https://auth.ejemplo.com/oauth/authorize",
+        "tokenUrl": "https://auth.ejemplo.com/oauth/token",
+        "scopes": ["read", "write", "admin"],
+        "description": "Autenticación OAuth2 para acceso avanzado"
+      },
+      {
+        "type": "jwt",
+        "algorithm": "RS256",
+        "issuer": "https://auth.ejemplo.com",
+        "audience": "mcp-server",
+        "description": "Token JWT para autenticación segura"
+      }
+    ],
+    "tokenExpiration": 3600,
+    "refreshTokenSupport": true
+  },
+
+  // ===== CONFIGURACIÓN DE CAPACIDADES =====
+  "capabilities": {
+    "resources": {
+      "subscribe": true,
+      "listChanged": true
+    },
+    "tools": {
+      "listChanged": true
+    },
+    "logging": {
+      "level": "info"
+    },
+    "sampling": {
+      "enabled": true
+    },
+    "experimental": {
+      "multimodal": false,
+      "streaming": true
+    }
+  },
+
+  // ===== CONFIGURACIÓN DE SEGURIDAD =====
+  "security": {
+    "rateLimiting": {
+      "global": {
+        "maxRequests": 1000,
+        "windowMs": 3600000,
+        "message": "Límite de solicitudes excedido"
+      },
+      "perUser": {
+        "maxRequests": 100,
+        "windowMs": 3600000
+      }
+    },
+    "validation": {
+      "strictMode": true,
+      "sanitizeInput": true,
+      "maxPayloadSize": 1048576
+    },
+    "encryption": {
+      "algorithm": "AES-256-GCM",
+      "keyRotation": true,
+      "keyRotationInterval": 604800000
+    }
+  },
+
+  // ===== CONFIGURACIÓN DE LOGGING =====
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "destinations": [
+      {
+        "type": "console",
+        "enabled": true
+      },
+      {
+        "type": "file",
+        "enabled": true,
+        "path": "./logs/mcp-server.log",
+        "maxSize": "10MB",
+        "maxFiles": 5,
+        "rotate": true
+      },
+      {
+        "type": "external",
+        "enabled": false,
+        "url": "https://logs.ejemplo.com/api/v1/logs",
+        "headers": {
+          "Authorization": "Bearer ${LOG_TOKEN}"
+        }
+      }
+    ],
+    "includeMetadata": true,
+    "sensitiveFields": ["password", "token", "apiKey"]
+  },
+
+  // ===== DEPENDENCIAS Y REQUISITOS =====
+  "dependencies": {
+    "node": ">=18.0.0",
+    "mcp-sdk": "^2.0.0",
+    "database": {
+      "type": "postgresql",
+      "minVersion": "13.0",
+      "optional": false
+    },
+    "redis": {
+      "minVersion": "6.0",
+      "optional": true,
+      "purpose": "caching"
+    }
+  },
+
+  // ===== CONFIGURACIÓN DE ENTORNO =====
+  "environment": {
+    "variables": [
+      {
+        "name": "DATABASE_URL",
+        "required": true,
+        "description": "URL de conexión a la base de datos",
+        "example": "postgresql://user:pass@localhost:5432/dbname"
+      },
+      {
+        "name": "API_KEY_SECRET",
+        "required": true,
+        "description": "Secreto para generar claves API",
+        "sensitive": true
+      },
+      {
+        "name": "REDIS_URL",
+        "required": false,
+        "description": "URL de conexión a Redis para cache",
+        "default": "redis://localhost:6379"
+      },
+      {
+        "name": "LOG_LEVEL",
+        "required": false,
+        "description": "Nivel de logging",
+        "default": "info",
+        "allowedValues": ["error", "warn", "info", "debug"]
+      }
+    ]
+  },
+
+  // ===== METADATOS ADICIONALES =====
+  "metadata": {
+    "tags": ["database", "analytics", "reporting", "user-management"],
+    "category": "business-tools",
+    "maturity": "stable",
+    "supportEmail": "soporte@ejemplo.com",
+    "documentation": "https://docs.ejemplo.com/mcp-server",
+    "changelog": "https://github.com/usuario/example-mcp-server/blob/main/CHANGELOG.md",
+    "compatibility": {
+      "mcpVersion": "1.0.0",
+      "clientVersions": [">=1.0.0", "<3.0.0"]
+    },
+    "performance": {
+      "avgResponseTime": "150ms",
+      "maxConcurrentConnections": 100,
+      "throughput": "1000 req/min"
+    }
+  },
+
+  // ===== CONFIGURACIÓN DE DESARROLLO =====
+  "development": {
+    "hot_reload": true,
+    "debug_mode": false,
+    "test_data": {
+      "enabled": false,
+      "reset_on_start": false
+    },
+    "mock_services": {
+      "database": false,
+      "external_apis": false
+    }
+  }
+}
