@@ -10,13 +10,11 @@ Este repositorio contiene material de apoyo para la charla "MCP: Un protocolo pa
 
 - **Material de la Presentación**
 
-  - `MCP_ Un protocolo para gobernarlos a todos.pptx` - Presentación en formato PowerPoint
   - `MCP_ Un protocolo para gobernarlos a todos.pdf` - Presentación en formato PDF
-  - `sauron.png` - Imagen utilizada en la presentación
 
 - **Documentación MCP**
 
-  - `mcp_manifest_documentation.md.docx` - Documentación del manifiesto MCP
+  - `mcp_manifest_documentation.pdf` - Documentación del manifiesto MCP
   - `mcp_manifest_example.json` - Ejemplo de archivo de manifiesto MCP
 
 - **Ejemplos de Implementación**
