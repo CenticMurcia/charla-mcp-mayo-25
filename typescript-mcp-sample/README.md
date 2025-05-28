@@ -44,6 +44,12 @@ You can test your MCP server using the MCP Inspector:
 npx @modelcontextprotocol/inspector docker run -i --rm charlamcp-centic
 ```
 
+or in the project directory:
+
+```sh
+npx @modelcontextprotocol/inspector npm run dev
+```
+
 ## Configuring Claude Desktop
 
 To make your MCP server available in Claude Desktop, create or edit the Claude configuration file:

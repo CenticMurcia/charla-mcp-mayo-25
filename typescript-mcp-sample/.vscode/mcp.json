@@ -1,0 +1,11 @@
+{
+    "servers": {
+        "charla-mcp-centic": {
+            "type": "stdio",
+            "command": "node",
+            "args": [
+                "/Users/paco.bravo/codigo/pruebas/charla-mcp-mayo-25/typescript-mcp-sample/dist/index.js"
+            ]
+        }
+    }
+}
