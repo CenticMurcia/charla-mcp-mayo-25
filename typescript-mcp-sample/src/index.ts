@@ -99,7 +99,7 @@ server.resource(
 
 // ~~~~~~ Ejemplo de recurso estático
 
-server.resource('local-image', 'image://local/my_picture', resourceCallback);
+server.resource('local-txt', 'txt://local/my_txt', resourceCallback);
 
 // ~~~~~~ Ejemplo de PROMPT
 
@@ -109,7 +109,7 @@ server.prompt('resume', {}, () => ({
       role: 'user',
       content: {
         type: 'text',
-        text: `Make a resume in markdown from previous messages and save it as pdf`
+        text: `haz un resumen de los archivos de tu contexto`
       }
     }
   ]
@@ -121,23 +121,23 @@ server.connect(transport).catch(console.error);
 // Utils
 
 async function resourceCallback(uri: URL) {
-  const imagePath = './sauron.png';
+  const imagePath = './sauron.jpg';
 
   try {
     const imageData = await fs.promises.readFile(imagePath);
 
-    const mimeType = 'image/png';
+    const mimeType = 'image/jpg';
 
     const foo: ReadResourceResult = {
       contents: [
         {
           uri: uri.href,
-          text: 'foo',
-          mimeType: mimeType,
+          text: 'Este es el texto de recurso que usaria el contexto',
+          //mimeType: mimeType,
           name: path.basename(imagePath),
           description: 'Una imagen local',
-          data: imageData
-        }
+          //blob: imageData
+        } as any
       ]
     };
 
