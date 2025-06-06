@@ -5,7 +5,7 @@ WORKDIR /app
 # Copiar archivos de configuración del proyecto
 COPY package*.json ./
 COPY tsconfig.json ./
-COPY sauron.png ./
+COPY sauron.jpg ./
 
 # Instalar dependencias
 RUN npm ci
